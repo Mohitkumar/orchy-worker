@@ -1,12 +1,22 @@
 package util
 
-import "google.golang.org/protobuf/types/known/structpb"
+import (
+	"encoding/json"
+
+	"google.golang.org/protobuf/types/known/structpb"
+)
 
 func ConvertToProto(data map[string]any) map[string]*structpb.Value {
 	out := make(map[string]*structpb.Value)
 	for k, v := range data {
 		if val, err := structpb.NewValue(v); err == nil {
 			out[k] = val
+		} else {
+			b, _ := json.Marshal(v)
+			x := map[string]any{}
+			json.Unmarshal(b, &x)
+			mapVal, _ := structpb.NewValue(x)
+			out[k] = mapVal
 		}
 	}
 	return out
